@@ -1,0 +1,5 @@
+aiogram==3.3.0
+environs==10.3.0
+fastapi==0.109.2
+pip-chill==1.0.3
+uvicorn==0.27.0.post1
