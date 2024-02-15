@@ -2,11 +2,12 @@ from aiogram import types
 from aiohttp import web
 from fastapi import Request, FastAPI, HTTPException
 
-from config import WEBHOOK_PATH, WEBHOOK_URI, BOT_TOKEN
-
-from loader import bot, dp
+from core.config import WEBHOOK_PATH, WEBHOOK_URI, BOT_TOKEN
+from core.loader import bot, dp
 
 import handlers
+from utils.notify_admins import on_startup_notify, on_shutdown_notify
+from utils.set_bot_commands import set_default_commands
 
 app = FastAPI()
 
@@ -30,10 +31,17 @@ async def handle_webhook(request: Request):
 
 async def on_startup():
     await set_webhook()
+    await set_default_commands(bot)
+    await on_startup_notify(bot)
+
+
+async def on_shutdown():
+    await on_shutdown_notify(bot)
 
 
 if __name__ == "__main__":
     app.add_event_handler("startup", on_startup)
+    app.add_event_handler("shutdown", on_shutdown)
 
     @app.post(WEBHOOK_PATH)
     async def webhook_endpoint(request: Request):
